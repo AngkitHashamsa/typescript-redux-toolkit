@@ -1,24 +1,53 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "./app/store";
+import Reservation from "./components/Reservation";
+import CustomerCard from "./components/CustomerCard";
+import { addReservation } from "./features/reservationSlice";
+import "./App.css";
 
 function App() {
+  const reservation = useSelector(
+    (state: RootState) => state.reservation.value
+  );
+
+  const customers = useSelector((state: RootState) => state.customer.value);
+
+  const dispatch = useDispatch();
+  const [reserVation, setReservation] = useState("");
+
+  const onReserVationSubmit = () => {
+    if (!reserVation) return;
+    dispatch(addReservation(reserVation));
+    setReservation("");
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="container">
+        <div className="reservation-container">
+          <div>
+            <h5 className="reservation-header">Reservations</h5>
+            <div className="reservation-cards-container">
+              {reservation.map((item, index) => (
+                <Reservation customer={item} key={index} index={index} />
+              ))}
+            </div>
+          </div>
+          <div className="reservation-input-container">
+            <input
+              value={reserVation}
+              onChange={(e) => setReservation(e.target.value)}
+            />
+            <button onClick={onReserVationSubmit}>Add</button>
+          </div>
+        </div>
+        <div className="customer-food-container">
+          {customers.map((item) => (
+            <CustomerCard item={item} key={item.id} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
